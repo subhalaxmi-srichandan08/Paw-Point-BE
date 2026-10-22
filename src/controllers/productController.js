@@ -11,7 +11,7 @@ class ProductController {
                 await productService.getAllProducts(
                     req.query
                 );
-
+                // console.log("result", result);  
             res.status(200).json({
 
                 success: true,
@@ -28,12 +28,13 @@ class ProductController {
 
     }
     async getProduct(req, res, next) {
+        console.log("req.params.id", req.params);
 
         try {
 
             const product =
-                await productService.getProductBySlug(
-                    req.params.slug
+                await productService.getProductById(
+                    req.params.id
                 );
 
             if (!product) {

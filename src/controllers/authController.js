@@ -56,7 +56,7 @@ class AuthController {
                     password,
                     req, res
                 );
-
+                console.log("result", result);
             return res.json({
 
                 success: true,

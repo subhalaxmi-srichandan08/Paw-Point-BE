@@ -1,6 +1,7 @@
 const Product = require("../models/Product");
 const Brand = require("../models/Brand");
 const Category = require("../models/Category");
+const mongoose = require("mongoose");
 
 class ProductService {
 
@@ -265,20 +266,33 @@ class ProductService {
         };
 
     }
-    async getProductBySlug(slug) {
-        const product = await Product.findOne({
-            slug,
-            isActive: true,
-            isDeleted: false
-        })
-            .populate("brand", "name slug logo")
-            .populate("category", "name slug pet")
-            .lean();
+    async getProductById(id) {
 
-        if (!product)
-            return null;
+    // 1. Validate MongoDB ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return null;
+    }
 
-        const relatedProducts = await Product.find({
+    // 2. Fetch product by ID
+    const product = await Product.findOne({
+        _id: id,
+        isActive: true,
+        isDeleted: false
+    })
+        .populate("brand", "name slug logo")
+        .populate("category", "name slug pet")
+        .lean();
+
+    // 3. Handle missing product
+    if (!product) {
+        return null;
+    }
+
+    // 4. Fetch related products only if category exists
+    let relatedProducts = [];
+
+    if (product.category?._id) {
+        relatedProducts = await Product.find({
             category: product.category._id,
             _id: { $ne: product._id },
             isActive: true,
@@ -288,13 +302,16 @@ class ProductService {
             .select(
                 "name slug thumbnail price discountPrice rating reviewCount brand labels"
             )
+            .populate("brand", "name slug logo")
             .lean();
-
-        return {
-            product,
-            relatedProducts
-        };
     }
+
+    // 5. Return product and related products
+    return {
+        product,
+        relatedProducts
+    };
+}
 
     async getProductsByLabel(label) {
 

@@ -6,15 +6,9 @@ const productController =
     require("../controllers/productController");
 
 
-router.get(
-    "/",
-    productController.getProducts
-);
+router.get("/",productController.getProducts);
 
-router.get(
-    "/featured",
-    productController.getFeaturedProducts
-);
+router.get("/featured",productController.getFeaturedProducts);
 
 router.get(
     "/best-sellers",
@@ -32,7 +26,7 @@ router.get(
 );
 
 router.get(
-    "/:slug",
+    "/:id",
     productController.getProduct
 );
 
